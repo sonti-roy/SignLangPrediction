@@ -1,28 +1,26 @@
 import streamlit as st
-from cv2 import cv2
+import cv2
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+
 
 # st.title('Hello World!')
 
 # st.write('This is a simple Streamlit app.')
 
-# Access the camera
-cap = cv2.VideoCapture(0)
+class VideoTransformer(VideoTransformerBase):
+    def transform(self, frame):
+        # Perform any image processing operations here
+        return frame
 
-# Check if camera is opened successfully
-if not cap.isOpened():
-    st.error("Unable to access camera")
-else:
-    # Capture frame-by-frame
-    ret, frame = cap.read()
 
-    # Display the captured frame
-    st.image(frame, channels="BGR")
+def main():
+    st.title("OpenCV with Streamlit-WebRTC")
 
-    # Button to click live picture
-    if st.button("Click Picture"):
-        # Save the frame as an image file
-        cv2.imwrite("live_picture.jpg", frame)
-        st.success("Picture saved successfully")
+    webrtc_ctx = webrtc_streamer(
+        key="example",
+        video_transformer_factory=VideoTransformer,
+        async_transform=True,
+    )
 
-# Release the camera
-cap.release()
+    if webrtc_ctx.video_transformer:
+        st.write("Webcam is running")
