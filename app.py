@@ -22,8 +22,9 @@ if img_file_buffer is not None:
     
     img = remove(img) 
 
+    img_resized=resize(img,(64,64,3))  
     # To convert PIL Image to numpy array:
-    img_array = np.array(img)
+    img_array = np.array(img_resized)
     
     # img_file_buffer=imread(img_file_buffer) 
     # cv2_img = resize(img_file_buffer, (64, 64, 3))
@@ -31,25 +32,25 @@ if img_file_buffer is not None:
     # flat_data = cv2_img.flatten()
     # flat_data=np.array(flat_data) 
     # # reshape to 2D array
-    flat_data = img_array.reshape(1,-1)
+    # flat_data = img_array.reshape(1,-1)
     
-    # select only 10 features from 0 to 10
-    flat_data = flat_data[:,0:10]
+    # # select only 10 features from 0 to 10
+    # flat_data = flat_data[:,0:10]
 
     # # transfor the array using pca to select 10 features
-    # from sklearn.decomposition import PCA
-    # num_features = 10  # Number of features to extract
-    # pca = PCA(n_components=num_features)  # PCA for feature extraction
-    # # Perform PCA to extract 10 features
-    # pca.fit(flat_data)
-    # flat_data_pca = pca.transform(flat_data)
+    from sklearn.decomposition import PCA
+    num_features = 10  # Number of features to extract
+    pca = PCA(n_components=num_features)  # PCA for feature extraction
+    # Perform PCA to extract 10 features
+    pca.fit(img_array)
+    flat_data_pca = pca.transform(img_array)
     
     # load the model
     import pickle
     # load the model from disk
     loaded_model = pickle.load(open('svm_model.sav', 'rb'))
     # make a prediction
-    prediction = loaded_model.predict(flat_data)
+    prediction = loaded_model.predict(flat_data_pca)
     st.write(prediction)
     
 
