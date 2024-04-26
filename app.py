@@ -3,7 +3,21 @@ import cv2
 import numpy as np
 from skimage.transform import resize
 
+# Importing Required Modules 
+from rembg import remove 
+from PIL import Image 
+
+
 img_file_buffer = st.camera_input("Take a picture")
+
+# Processing the image 
+input = Image.open(img_file_buffer) 
+
+# Removing the background from the given Image 
+img_file_buffer = remove(input) 
+
+
+
 
 if img_file_buffer is not None:
     # To read image file buffer with OpenCV:
