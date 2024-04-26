@@ -14,6 +14,8 @@ if img_file_buffer is not None:
     ## flatten the image
     flat_data = cv2_img.flatten()
     flat_data=np.array(flat_data) 
+    # reshape to 2D array
+    flat_data = flat_data.reshape(1,-1)
 
     # transfor the array using pca to select 10 features
     from sklearn.decomposition import PCA
