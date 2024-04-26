@@ -10,11 +10,9 @@ from PIL import Image
 
 img_file_buffer = st.camera_input("Take a picture")
 
-# Processing the image 
-input = Image.open(img_file_buffer) 
 
 # Removing the background from the given Image 
-img_file_buffer = remove(input) 
+img_file_buffer = remove(img_file_buffer) 
 
 
 
