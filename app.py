@@ -1,24 +1,21 @@
 import streamlit as st
-import numpy as np
-from PIL import Image
 import cv2
-
-
-
-# from skimage.io import imread
-# from skimage.transform import resize
+import numpy as np
 
 img_file_buffer = st.camera_input("Take a picture")
 
-# Saves
-img = Image.open(img_file_buffer)
-img = img.save("img.jpg")
+if img_file_buffer is not None:
+    # To read image file buffer with OpenCV:
+    bytes_data = img_file_buffer.getvalue()
+    cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-# OpenCv Read
-img = cv2.imread("img.jpg")
+    # Check the type of cv2_img:
+    # Should output: <class 'numpy.ndarray'>
+    st.write(type(cv2_img))
 
-# Display
-st.image(img, channels="BGR", use_column_width=True)
+    # Check the shape of cv2_img:
+    # Should output shape: (height, width, channels)
+    st.write(cv2_img.shape)
 
 
 
