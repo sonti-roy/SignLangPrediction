@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 from skimage.transform import resize
+from skimage.io import imread
 
 # Importing Required Modules 
 from rembg import remove 
@@ -25,6 +26,7 @@ if img_file_buffer is not None:
     # bytes_data = img_file_buffer.getvalue()
     # cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     # resize the image
+    img_file_buffer=imread(img_file_buffer) 
     cv2_img = resize(img_file_buffer, (64, 64, 3))
     ## flatten the image
     flat_data = cv2_img.flatten()
