@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
-from skimage.io import imread
-from skimage.transform import resize
+# from skimage.io import imread
+# from skimage.transform import resize
 
 img_file_buffer = st.camera_input("Take a picture")
 
