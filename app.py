@@ -21,10 +21,12 @@ if img_file_buffer is not None:
     img = Image.open(img_file_buffer)
     
     img = remove(img) 
+    img_array = np.array(img)
 
-    img_resized=resize(img,(64,64,3))  
+    img_resized=resize(img_array,(64,64,3))
+    flat_data = img_resized.flatten()   
     # To convert PIL Image to numpy array:
-    img_array = np.array(img_resized)
+    img_array = np.array(flat_data)
     
     # img_file_buffer=imread(img_file_buffer) 
     # cv2_img = resize(img_file_buffer, (64, 64, 3))
