@@ -11,13 +11,16 @@ from PIL import Image
 img_file_buffer = st.camera_input("Take a picture")
 
 
-# Removing the background from the given Image 
-img_file_buffer = remove(img_file_buffer) 
 
 
 
 
 if img_file_buffer is not None:
+    # Processing the image 
+    input = Image.open(img_file_buffer) 
+
+    # Removing the background from the given Image 
+    img_file_buffer = remove(input) 
     # To read image file buffer with OpenCV:
     bytes_data = img_file_buffer.getvalue()
     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
