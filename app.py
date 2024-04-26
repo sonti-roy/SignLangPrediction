@@ -17,22 +17,19 @@ img_file_buffer = st.camera_input("Take a picture")
 
 
 if img_file_buffer is not None:
-    # Processing the image 
-    input = Image.open(img_file_buffer) 
+    
+    img = Image.open(img_file_buffer)
 
-    # Removing the background from the given Image 
-    img_file_buffer = remove(input) 
-    # To read image file buffer with OpenCV:
-    # bytes_data = img_file_buffer.getvalue()
-    # cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    # resize the image
-    img_file_buffer=imread(img_file_buffer) 
-    cv2_img = resize(img_file_buffer, (64, 64, 3))
-    ## flatten the image
-    flat_data = cv2_img.flatten()
-    flat_data=np.array(flat_data) 
-    # reshape to 2D array
-    flat_data = flat_data.reshape(1,-1)
+    # To convert PIL Image to numpy array:
+    img_array = np.array(img)
+    
+    # img_file_buffer=imread(img_file_buffer) 
+    # cv2_img = resize(img_file_buffer, (64, 64, 3))
+    # ## flatten the image
+    # flat_data = cv2_img.flatten()
+    # flat_data=np.array(flat_data) 
+    # # reshape to 2D array
+    flat_data = img_array.reshape(1,-1)
     
     # select only 10 features from 0 to 10
     flat_data = flat_data[:,0:10]
