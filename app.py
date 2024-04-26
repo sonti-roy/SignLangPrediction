@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 from PIL import Image
+import cv2
 
 
 # from skimage.io import imread
@@ -8,12 +9,15 @@ from PIL import Image
 
 img_file_buffer = st.camera_input("Take a picture")
 
-# read the image and convert to array
+# Saves
+img = Image.open(img_file_buffer)
+img = img.save("img.jpg")
 
-image = Image.open(img_file_buffer)
-image = np.array(image)
+# OpenCv Read
+img = cv2.imread("img.jpg")
 
-st.image(image, caption="Captured Image", use_column_width=True)
+# Display
+st.image(img, channels="BGR", use_column_width=True)
 
 
 
