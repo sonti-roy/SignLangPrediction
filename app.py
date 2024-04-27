@@ -43,8 +43,8 @@ if img_file_buffer is not None:
 
     probability=model.predict_proba(pca_transformed)
     for ind,val in enumerate(Categories):
-        print(f'{val} = {probability[0][ind]*100}%')
-        print("The predicted image is : "+Categories[model.predict(pca_transformed)[0]])
+        st.write(f'{val} : {probability[0][ind]}')
+        st.write("The predicted character is: ", Categories[np.argmax(probability)])
 
 
 
