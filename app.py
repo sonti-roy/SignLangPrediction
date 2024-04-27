@@ -13,7 +13,7 @@ img_file_buffer = st.camera_input("Take a picture")
 
 
 
-
+Categories = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y']
 
 
 if img_file_buffer is not None:
@@ -22,39 +22,29 @@ if img_file_buffer is not None:
     
     img = remove(img) 
     img_array = np.array(img)
+    
+    target_img_resized=resize(img_array,(96,96,3))
+    target_img_flatten = target_img_resized.flatten()
 
-    img_resized=resize(img_array,(64,64,3))
-    flat_data = img_resized.flatten()   
-    # To convert PIL Image to numpy array:
-    img_array = np.array(flat_data)
-    
-    # img_file_buffer=imread(img_file_buffer) 
-    # cv2_img = resize(img_file_buffer, (64, 64, 3))
-    # ## flatten the image
-    # flat_data = cv2_img.flatten()
-    # flat_data=np.array(flat_data) 
-    # # reshape to 2D array
-    # flat_data = img_array.reshape(1,-1)
-    
-    # # select only 10 features from 0 to 10
-    # flat_data = flat_data[:,0:10]
+    # Load saved PCA model
+    saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
 
-    # # transfor the array using pca to select 10 features
-    from sklearn.decomposition import PCA
-    num_features = 10  # Number of features to extract
-    pca = PCA(n_components=num_features)  # PCA for feature extraction
-    # Perform PCA to extract 10 features
-    pca.fit(img_array)
-    flat_data_pca = pca.transform(img_array)
+    # Subtract mean and project onto eigenvectors
+    mean_vector = saved_pca.mean_
+    eigenvectors = saved_pca.components_
+    centered_image = target_img_flatten - mean_vector
+    pca_transformed = np.dot(centered_image, eigenvectors.T)
+
+    # reshape the pca_transformed array
+    pca_transformed = pca_transformed.reshape(1, -1)
     
-    # load the model
-    import pickle
-    # load the model from disk
-    loaded_model = pickle.load(open('svm_model.sav', 'rb'))
-    # make a prediction
-    prediction = loaded_model.predict(flat_data_pca)
-    st.write(prediction)
-    
+    model = pickle.load(open("svm_model.pkl", 'rb'))
+
+    probability=model.predict_proba(pca_transformed)
+    for ind,val in enumerate(Categories):
+        print(f'{val} = {probability[0][ind]*100}%')
+        print("The predicted image is : "+Categories[model.predict(pca_transformed)[0]])
+
 
 
 
