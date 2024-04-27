@@ -7,6 +7,7 @@ from skimage.io import imread
 # Importing Required Modules 
 from rembg import remove 
 from PIL import Image 
+import pickle
 
 
 img_file_buffer = st.camera_input("Take a picture")
