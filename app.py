@@ -84,53 +84,49 @@ def crop_hand(image, hand_landmarks):
 Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
 # Streamlit app
-def main():
-    st.title("Hand Gesture Recognition App")
 
-    # Camera input to capture a picture
-    img_file_buffer = st.camera_input("Capture a picture")
 
-    if img_file_buffer is not None:
-        img = Image.open(img_file_buffer)
+# Camera input to capture a picture
+img_file_buffer = st.camera_input("Capture a picture")
 
-        # Convert to RGB and process with Mediapipe Hands
-        img_rgb = np.array(img.convert('RGB'))
-        results = hands.process(img_rgb)
+if img_file_buffer is not None:
+    img = Image.open(img_file_buffer)
 
-        # Check if hands are present in the image
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                # Crop the hand region
-                cropped_hand = crop_hand(img_rgb, np.array([[lm.x, lm.y] for lm in hand_landmarks.landmark]))
-                # Remove background using rembg
-                cropped_hand = remove(cropped_hand)
-                # Resize and flatten the image for classification
-                target_img_resized = resize(cropped_hand, (96, 96, 3))
-                target_img_flatten = target_img_resized.flatten()
+    # Convert to RGB and process with Mediapipe Hands
+    img_rgb = np.array(img.convert('RGB'))
+    results = hands.process(img_rgb)
 
-                # Load saved PCA model
-                saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
+    # Check if hands are present in the image
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            # Crop the hand region
+            cropped_hand = crop_hand(img_rgb, np.array([[lm.x, lm.y] for lm in hand_landmarks.landmark]))
+            # Remove background using rembg
+            cropped_hand = remove(cropped_hand)
+            # Resize and flatten the image for classification
+            target_img_resized = resize(cropped_hand, (96, 96, 3))
+            target_img_flatten = target_img_resized.flatten()
 
-                # Subtract mean and project onto eigenvectors
-                mean_vector = saved_pca.mean_
-                eigenvectors = saved_pca.components_
-                centered_image = target_img_flatten - mean_vector
-                pca_transformed = np.dot(centered_image, eigenvectors.T)
+            # Load saved PCA model
+            saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
 
-                # Reshape the pca_transformed array
-                pca_transformed = pca_transformed.reshape(1, -1)
+            # Subtract mean and project onto eigenvectors
+            mean_vector = saved_pca.mean_
+            eigenvectors = saved_pca.components_
+            centered_image = target_img_flatten - mean_vector
+            pca_transformed = np.dot(centered_image, eigenvectors.T)
 
-                # Load SVM model for classification
-                model = pickle.load(open("svm_model.pkl", 'rb'))
+            # Reshape the pca_transformed array
+            pca_transformed = pca_transformed.reshape(1, -1)
 
-                # Predict probabilities and show results
-                probability = model.predict_proba(pca_transformed)
-                for ind, val in enumerate(Categories):
-                    st.write(f'{val} : {probability[0][ind]}')
-                st.write("The predicted character is: ", Categories[np.argmax(probability)])
+            # Load SVM model for classification
+            model = pickle.load(open("svm_model.pkl", 'rb'))
 
-if __name__ == "__main__":
-    main()
+            # Predict probabilities and show results
+            probability = model.predict_proba(pca_transformed)
+            for ind, val in enumerate(Categories):
+                st.write(f'{val} : {probability[0][ind]}')
+            st.write("The predicted character is: ", Categories[np.argmax(probability)])
 
 
     
