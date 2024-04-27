@@ -1,3 +1,57 @@
+# import streamlit as st
+# import cv2
+# import numpy as np
+# from skimage.transform import resize
+# from skimage.io import imread
+
+# # Importing Required Modules 
+# from rembg import remove 
+# from PIL import Image 
+# import pickle
+
+
+
+# img_file_buffer = st.camera_input("Take a picture")
+
+
+
+# Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+
+
+# if img_file_buffer is not None:
+    
+#     img = Image.open(img_file_buffer)
+    
+#     # isolate hand from the image
+#     img = np.array(img)
+#     img = crop_hand(img)
+    
+#     img = remove(img) 
+#     img_array = np.array(img)
+    
+#     target_img_resized=resize(img_array,(96,96,3))
+#     target_img_flatten = target_img_resized.flatten()
+
+#     # Load saved PCA model
+#     saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
+
+#     # Subtract mean and project onto eigenvectors
+#     mean_vector = saved_pca.mean_
+#     eigenvectors = saved_pca.components_
+#     centered_image = target_img_flatten - mean_vector
+#     pca_transformed = np.dot(centered_image, eigenvectors.T)
+
+#     # reshape the pca_transformed array
+#     pca_transformed = pca_transformed.reshape(1, -1)
+    
+#     model = pickle.load(open("svm_model.pkl", 'rb'))
+
+#     probability=model.predict_proba(pca_transformed)
+#     for ind,val in enumerate(Categories):
+#         st.write(f'{val} : {probability[0][ind]}')
+#         st.write("The predicted character is: ", Categories[np.argmax(probability)])
+
+
 import streamlit as st
 import cv2
 import numpy as np
@@ -8,45 +62,75 @@ from skimage.io import imread
 from rembg import remove 
 from PIL import Image 
 import pickle
+import mediapipe as mp
 
+# Initialize Mediapipe Hands model
+mpHands = mp.solutions.hands
+hands = mpHands.Hands(
+    static_image_mode=False,
+    model_complexity=1,
+    min_detection_confidence=0.75,
+    min_tracking_confidence=0.75,
+    max_num_hands=2
+)
 
-img_file_buffer = st.camera_input("Take a picture")
-
-
+# Function to crop hand from the image
+def crop_hand(image, hand_landmarks):
+    x_min, y_min = np.min(hand_landmarks, axis=0)
+    x_max, y_max = np.max(hand_landmarks, axis=0)
+    cropped_hand = image[int(y_min):int(y_max), int(x_min):int(x_max)]
+    return cropped_hand
 
 Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
+# Streamlit app
+def main():
+    st.title("Hand Gesture Recognition App")
 
-if img_file_buffer is not None:
-    
-    img = Image.open(img_file_buffer)
-    
-    img = remove(img) 
-    img_array = np.array(img)
-    
-    target_img_resized=resize(img_array,(96,96,3))
-    target_img_flatten = target_img_resized.flatten()
+    # Camera input to capture a picture
+    img_file_buffer = st.camera_input("Capture a picture")
 
-    # Load saved PCA model
-    saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
+    if img_file_buffer is not None:
+        img = Image.open(img_file_buffer)
 
-    # Subtract mean and project onto eigenvectors
-    mean_vector = saved_pca.mean_
-    eigenvectors = saved_pca.components_
-    centered_image = target_img_flatten - mean_vector
-    pca_transformed = np.dot(centered_image, eigenvectors.T)
+        # Convert to RGB and process with Mediapipe Hands
+        img_rgb = np.array(img.convert('RGB'))
+        results = hands.process(img_rgb)
 
-    # reshape the pca_transformed array
-    pca_transformed = pca_transformed.reshape(1, -1)
-    
-    model = pickle.load(open("svm_model.pkl", 'rb'))
+        # Check if hands are present in the image
+        if results.multi_hand_landmarks:
+            for hand_landmarks in results.multi_hand_landmarks:
+                # Crop the hand region
+                cropped_hand = crop_hand(img_rgb, np.array([[lm.x, lm.y] for lm in hand_landmarks.landmark]))
+                # Remove background using rembg
+                cropped_hand = remove(cropped_hand)
+                # Resize and flatten the image for classification
+                target_img_resized = resize(cropped_hand, (96, 96, 3))
+                target_img_flatten = target_img_resized.flatten()
 
-    probability=model.predict_proba(pca_transformed)
-    for ind,val in enumerate(Categories):
-        st.write(f'{val} : {probability[0][ind]}')
-        st.write("The predicted character is: ", Categories[np.argmax(probability)])
+                # Load saved PCA model
+                saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
 
+                # Subtract mean and project onto eigenvectors
+                mean_vector = saved_pca.mean_
+                eigenvectors = saved_pca.components_
+                centered_image = target_img_flatten - mean_vector
+                pca_transformed = np.dot(centered_image, eigenvectors.T)
 
+                # Reshape the pca_transformed array
+                pca_transformed = pca_transformed.reshape(1, -1)
+
+                # Load SVM model for classification
+                model = pickle.load(open("svm_model.pkl", 'rb'))
+
+                # Predict probabilities and show results
+                probability = model.predict_proba(pca_transformed)
+                for ind, val in enumerate(Categories):
+                    st.write(f'{val} : {probability[0][ind]}')
+                st.write("The predicted character is: ", Categories[np.argmax(probability)])
+
+if __name__ == "__main__":
+    main()
 
 
     
