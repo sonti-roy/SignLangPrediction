@@ -22,72 +22,72 @@ img_file_buffer = st.camera_input("Take a picture")
 # # Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
 
-if img_file_buffer is not None:
+# if img_file_buffer is not None:
     
-    # Initialize holistic model and drawing utils
-    mp_holistic = mp.solutions.holistic
-    mp_drawing = mp.solutions.drawing_utils
+#     # Initialize holistic model and drawing utils
+#     mp_holistic = mp.solutions.holistic
+#     mp_drawing = mp.solutions.drawing_utils
 
-    # Load the image
-    # image_path = '/kaggle/input/download/download.jpg'
-    image = cv2.imread(img_file_buffer)
+#     # Load the image
+#     # image_path = '/kaggle/input/download/download.jpg'
+#     image = cv2.imread(img_file_buffer)
 
-    # Convert the image from BGR to RGB
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+#     # Convert the image from BGR to RGB
+#     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Initialize holistic model with min detection confidence
-    holistic_model = mp_holistic.Holistic(
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5
-    )
+#     # Initialize holistic model with min detection confidence
+#     holistic_model = mp_holistic.Holistic(
+#         min_detection_confidence=0.5,
+#         min_tracking_confidence=0.5
+#     )
 
-    # Make prediction on the image
-    results = holistic_model.process(image_rgb)
+#     # Make prediction on the image
+#     results = holistic_model.process(image_rgb)
 
-    # Extract hand landmarks
-    if results.right_hand_landmarks:
-        # Get landmarks for right hand
-        hand_landmarks = results.right_hand_landmarks
+#     # Extract hand landmarks
+#     if results.right_hand_landmarks:
+#         # Get landmarks for right hand
+#         hand_landmarks = results.right_hand_landmarks
 
-        # Extract bounding box coordinates for the hand
-        bbox_min_x = min(hand_landmarks.landmark, key=lambda x: x.x).x
-        bbox_min_y = min(hand_landmarks.landmark, key=lambda x: x.y).y
-        bbox_max_x = max(hand_landmarks.landmark, key=lambda x: x.x).x
-        bbox_max_y = max(hand_landmarks.landmark, key=lambda x: x.y).y
+#         # Extract bounding box coordinates for the hand
+#         bbox_min_x = min(hand_landmarks.landmark, key=lambda x: x.x).x
+#         bbox_min_y = min(hand_landmarks.landmark, key=lambda x: x.y).y
+#         bbox_max_x = max(hand_landmarks.landmark, key=lambda x: x.x).x
+#         bbox_max_y = max(hand_landmarks.landmark, key=lambda x: x.y).y
 
-        # Convert bounding box coordinates to pixel values
-        img_height, img_width, _ = image.shape
-        bbox_min_x = int(bbox_min_x * img_width)
-        bbox_min_y = int(bbox_min_y * img_height)
-        bbox_max_x = int(bbox_max_x * img_width)
-        bbox_max_y = int(bbox_max_y * img_height)
+#         # Convert bounding box coordinates to pixel values
+#         img_height, img_width, _ = image.shape
+#         bbox_min_x = int(bbox_min_x * img_width)
+#         bbox_min_y = int(bbox_min_y * img_height)
+#         bbox_max_x = int(bbox_max_x * img_width)
+#         bbox_max_y = int(bbox_max_y * img_height)
 
-        # Add extra space around the bounding box (e.g., 20 pixels)
-        extra_space = 20
-        bbox_min_x -= extra_space
-        bbox_min_y -= extra_space
-        bbox_max_x += extra_space
-        bbox_max_y += extra_space
+#         # Add extra space around the bounding box (e.g., 20 pixels)
+#         extra_space = 20
+#         bbox_min_x -= extra_space
+#         bbox_min_y -= extra_space
+#         bbox_max_x += extra_space
+#         bbox_max_y += extra_space
 
-        # Ensure the coordinates are within the image boundaries
-        bbox_min_x = max(0, bbox_min_x)
-        bbox_min_y = max(0, bbox_min_y)
-        bbox_max_x = min(img_width, bbox_max_x)
-        bbox_max_y = min(img_height, bbox_max_y)
+#         # Ensure the coordinates are within the image boundaries
+#         bbox_min_x = max(0, bbox_min_x)
+#         bbox_min_y = max(0, bbox_min_y)
+#         bbox_max_x = min(img_width, bbox_max_x)
+#         bbox_max_y = min(img_height, bbox_max_y)
 
-        # Crop hand region from the image
-        hand_cropped = image[bbox_min_y:bbox_max_y, bbox_min_x:bbox_max_x]
+#         # Crop hand region from the image
+#         hand_cropped = image[bbox_min_y:bbox_max_y, bbox_min_x:bbox_max_x]
 
-        # Display the cropped hand region
-        plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
-        plt.axis('off')  # Turn off axis
-        plt.show()
+#         # Display the cropped hand region
+#         plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
+#         plt.axis('off')  # Turn off axis
+#         plt.show()
         
-    else:
-        print('No hand detected in the image.')
+#     else:
+#         print('No hand detected in the image.')
 
-    # Release resources
-    holistic_model.close()
+#     # Release resources
+#     holistic_model.close()
 
 
 
