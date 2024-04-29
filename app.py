@@ -99,7 +99,8 @@ if img_file_buffer is not None:
         
         Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
         
-        hand_cropped = cv2.imread(hand_cropped)
+        # convert the hand_cropped image to array
+        hand_cropped = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB)
         target_img_resized = resize(hand_cropped, (96, 96, 3))
         target_img_flatten = target_img_resized.flatten()
 
