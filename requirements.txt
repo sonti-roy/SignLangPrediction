@@ -1,7 +1,7 @@
 streamlit
 numpy
-opencv-python-headless
+mediapipe
 scikit-learn
 scikit-image
 rembg
-mediapipe
+opencv-python-headless
