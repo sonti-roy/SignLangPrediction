@@ -1,8 +1,8 @@
 import streamlit as st
 import numpy as np
-import mediapipe as mp
 import matplotlib.pyplot as plt
 import cv2
+import mediapipe as mp
 
 # # import cv2
 # # import numpy as np
@@ -17,9 +17,6 @@ import cv2
 
 
 img_file_buffer = st.camera_input("Take a picture")
-
-
-
 
 # Initialize holistic model and drawing utils
 mp_holistic = mp.solutions.holistic
