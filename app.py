@@ -3,6 +3,8 @@ import numpy as np
 import mediapipe as mp
 import streamlit as st
 import matplotlib.pyplot as plt
+from skimage.transform import resize
+import pickle
 
 # # import cv2
 # # import numpy as np
@@ -100,8 +102,38 @@ if img_file_buffer is not None:
 
     else:
         st.warning("No hand detected in the image.")
+        
+Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
-# # Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+# cropped_hand = crop_hand(img_rgb, np.array([[lm.x, lm.y] for lm in hand_landmarks.landmark]))
+# # Remove background using rembg
+# cropped_hand = remove(cropped_hand)
+# Resize and flatten the image for classification
+target_img_resized = resize(hand_cropped, (96, 96, 3))
+target_img_flatten = target_img_resized.flatten()
+
+# Load saved PCA model
+saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
+
+# Subtract mean and project onto eigenvectors
+mean_vector = saved_pca.mean_
+eigenvectors = saved_pca.components_
+centered_image = target_img_flatten - mean_vector
+pca_transformed = np.dot(centered_image, eigenvectors.T)
+
+# Reshape the pca_transformed array
+pca_transformed = pca_transformed.reshape(1, -1)
+
+# Load SVM model for classification
+model = pickle.load(open("svm_model.pkl", 'rb'))
+
+# Predict probabilities and show results
+probability = model.predict_proba(pca_transformed)
+for ind, val in enumerate(Categories):
+    st.write(f'{val} : {probability[0][ind]}')
+    st.write("The predicted character is: ", Categories[np.argmax(probability)])
+
+# Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
 
 
 # if img_file_buffer is not None:
