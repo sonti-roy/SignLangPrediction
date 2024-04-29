@@ -98,7 +98,8 @@ if img_file_buffer is not None:
         st.pyplot()
         
         Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
-
+        
+        hand_cropped = cv2.imread(hand_cropped)
         target_img_resized = resize(hand_cropped, (96, 96, 3))
         target_img_flatten = target_img_resized.flatten()
 
