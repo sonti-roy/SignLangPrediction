@@ -21,149 +21,149 @@ from sklearn.cluster import KMeans
 
 img_file_buffer = st.camera_input("Take a picture")
 
-# Initialize holistic model and drawing utils
-mp_holistic = mp.solutions.holistic
-mp_drawing = mp.solutions.drawing_utils
+# # Initialize holistic model and drawing utils
+# mp_holistic = mp.solutions.holistic
+# mp_drawing = mp.solutions.drawing_utils
 
-# Function to process the image and detect hand
-def detect_hand(image):
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+# # Function to process the image and detect hand
+# def detect_hand(image):
+#     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    # Initialize holistic model with min detection confidence
-    holistic_model = mp_holistic.Holistic(
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5
-    )
+#     # Initialize holistic model with min detection confidence
+#     holistic_model = mp_holistic.Holistic(
+#         min_detection_confidence=0.5,
+#         min_tracking_confidence=0.5
+#     )
 
-    # Make prediction on the image
-    results = holistic_model.process(image_rgb)
+#     # Make prediction on the image
+#     results = holistic_model.process(image_rgb)
 
-    # Extract hand landmarks
-    if results.right_hand_landmarks:
-        # Get landmarks for right hand
-        hand_landmarks = results.right_hand_landmarks
+#     # Extract hand landmarks
+#     if results.right_hand_landmarks:
+#         # Get landmarks for right hand
+#         hand_landmarks = results.right_hand_landmarks
 
-        # Extract bounding box coordinates for the hand
-        bbox_min_x = min(hand_landmarks.landmark, key=lambda x: x.x).x
-        bbox_min_y = min(hand_landmarks.landmark, key=lambda x: x.y).y
-        bbox_max_x = max(hand_landmarks.landmark, key=lambda x: x.x).x
-        bbox_max_y = max(hand_landmarks.landmark, key=lambda x: x.y).y
+#         # Extract bounding box coordinates for the hand
+#         bbox_min_x = min(hand_landmarks.landmark, key=lambda x: x.x).x
+#         bbox_min_y = min(hand_landmarks.landmark, key=lambda x: x.y).y
+#         bbox_max_x = max(hand_landmarks.landmark, key=lambda x: x.x).x
+#         bbox_max_y = max(hand_landmarks.landmark, key=lambda x: x.y).y
 
-        # Convert bounding box coordinates to pixel values
-        img_height, img_width, _ = image.shape
-        bbox_min_x = int(bbox_min_x * img_width)
-        bbox_min_y = int(bbox_min_y * img_height)
-        bbox_max_x = int(bbox_max_x * img_width)
-        bbox_max_y = int(bbox_max_y * img_height)
+#         # Convert bounding box coordinates to pixel values
+#         img_height, img_width, _ = image.shape
+#         bbox_min_x = int(bbox_min_x * img_width)
+#         bbox_min_y = int(bbox_min_y * img_height)
+#         bbox_max_x = int(bbox_max_x * img_width)
+#         bbox_max_y = int(bbox_max_y * img_height)
 
-        # Add extra space around the bounding box (e.g., 20 pixels)
-        extra_space = 20
-        bbox_min_x -= extra_space
-        bbox_min_y -= extra_space
-        bbox_max_x += extra_space
-        bbox_max_y += extra_space
+#         # Add extra space around the bounding box (e.g., 20 pixels)
+#         extra_space = 20
+#         bbox_min_x -= extra_space
+#         bbox_min_y -= extra_space
+#         bbox_max_x += extra_space
+#         bbox_max_y += extra_space
 
-        # Ensure the coordinates are within the image boundaries
-        bbox_min_x = max(0, bbox_min_x)
-        bbox_min_y = max(0, bbox_min_y)
-        bbox_max_x = min(img_width, bbox_max_x)
-        bbox_max_y = min(img_height, bbox_max_y)
+#         # Ensure the coordinates are within the image boundaries
+#         bbox_min_x = max(0, bbox_min_x)
+#         bbox_min_y = max(0, bbox_min_y)
+#         bbox_max_x = min(img_width, bbox_max_x)
+#         bbox_max_y = min(img_height, bbox_max_y)
 
-        # Crop hand region from the image
-        hand_cropped = image[bbox_min_y:bbox_max_y, bbox_min_x:bbox_max_x]
+#         # Crop hand region from the image
+#         hand_cropped = image[bbox_min_y:bbox_max_y, bbox_min_x:bbox_max_x]
 
-        return hand_cropped
+#         return hand_cropped
 
-    else:
-        return None
+#     else:
+#         return None
 
-# Display title
-st.title("Hand Detection and Cropping")
+# # Display title
+# st.title("Hand Detection and Cropping")
 
 
+# if img_file_buffer is not None:
+#     # Read the uploaded image
+#     image = cv2.imdecode(np.frombuffer(img_file_buffer.read(), np.uint8), 1)
+
+#     # Display the uploaded image
+#     st.subheader("Uploaded Image")
+#     st.image(image, caption="Uploaded Image", use_column_width=True)
+
+#     # Detect hand and crop if detected
+#     hand_cropped = detect_hand(image)
 if img_file_buffer is not None:
-    # Read the uploaded image
-    image = cv2.imdecode(np.frombuffer(img_file_buffer.read(), np.uint8), 1)
+    # Display the cropped hand region
+    # st.subheader("Cropped Hand Region")
+    # plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
+    # plt.axis('off')
+    # st.pyplot()
+    
+    Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
+    
+    
+    ##########################################################
+    # load the model from disk
+    loaded_model = pickle.load(open("svm_model.pkl", 'rb'))
 
-    # Display the uploaded image
-    st.subheader("Uploaded Image")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Detect hand and crop if detected
-    hand_cropped = detect_hand(image)
-    if hand_cropped is not None:
-        # Display the cropped hand region
-        # st.subheader("Cropped Hand Region")
-        # plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
-        # plt.axis('off')
-        # st.pyplot()
+
+    # Function to extract SIFT features from a single image
+    def extract_sift_features(image):
+        # Convert the image to grayscale if it's not already
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # Initialize SIFT detector
+        sift = cv2.SIFT_create()
+
+        # Detect SIFT keypoints and descriptors
+        keypoints, descriptors = sift.detectAndCompute(image, None)
+
+        return descriptors
+
+    # Load the image
+    # image_path = 'output.png'
+    image = cv2.imread(img_file_buffer)
+    # image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
+
+    # Extract SIFT descriptors for the image
+    descriptors = extract_sift_features(image)
+
+    if descriptors is not None:
+        # Apply k-means clustering to create bins/clusters
+        num_clusters = 100  # Number of clusters (you can adjust this)
+        kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+        kmeans.fit(descriptors)
+
+        # Function to generate histogram of features using k-means clusters
+        def generate_histogram(image_descriptors):
+            # Predict cluster indices for each descriptor
+            cluster_indices = kmeans.predict(image_descriptors)
+
+            # Create histogram of features
+            hist, _ = np.histogram(cluster_indices, bins=num_clusters, range=(0, num_clusters))
+
+            # Normalize the histogram to sum to 1
+            hist = hist.astype(float)
+            hist /= hist.sum()
+
+            return hist
+
+        # Generate histogram of features using k-means clusters
+        hist = generate_histogram(descriptors)
+
+        # Print the shape of the histogram
+        print("Histogram shape:", hist.shape)
+    else:
+        print("No SIFT descriptors found in the image.")
         
-        Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
         
-        
-        ##########################################################
-        # load the model from disk
-        loaded_model = pickle.load(open("svm_model.pkl", 'rb'))
-
-
-
-        # Function to extract SIFT features from a single image
-        def extract_sift_features(image):
-            # Convert the image to grayscale if it's not already
-            if len(image.shape) == 3:
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-            # Initialize SIFT detector
-            sift = cv2.SIFT_create()
-
-            # Detect SIFT keypoints and descriptors
-            keypoints, descriptors = sift.detectAndCompute(image, None)
-
-            return descriptors
-
-        # Load the image
-        # image_path = 'output.png'
-        # image = cv2.imread(hand_cropped)
-        image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
-
-        # Extract SIFT descriptors for the image
-        descriptors = extract_sift_features(image)
-
-        if descriptors is not None:
-            # Apply k-means clustering to create bins/clusters
-            num_clusters = 100  # Number of clusters (you can adjust this)
-            kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-            kmeans.fit(descriptors)
-
-            # Function to generate histogram of features using k-means clusters
-            def generate_histogram(image_descriptors):
-                # Predict cluster indices for each descriptor
-                cluster_indices = kmeans.predict(image_descriptors)
-
-                # Create histogram of features
-                hist, _ = np.histogram(cluster_indices, bins=num_clusters, range=(0, num_clusters))
-
-                # Normalize the histogram to sum to 1
-                hist = hist.astype(float)
-                hist /= hist.sum()
-
-                return hist
-
-            # Generate histogram of features using k-means clusters
-            hist = generate_histogram(descriptors)
-
-            # Print the shape of the histogram
-            print("Histogram shape:", hist.shape)
-        else:
-            print("No SIFT descriptors found in the image.")
-            
-            
-        # predict the label of the image
-        # Predict the label of the image using the trained SVM model
-        predicted_label = loaded_model.predict(hist.reshape(1, -1))
-        
-        # PRINT THE PREDICTED LABEL
-        st.write("The predicted character is: ", predicted_label)
+    # predict the label of the image
+    # Predict the label of the image using the trained SVM model
+    predicted_label = loaded_model.predict(hist.reshape(1, -1))
+    
+    # PRINT THE PREDICTED LABEL
+    st.write("The predicted character is: ", predicted_label)
             
         
 
