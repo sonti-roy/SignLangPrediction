@@ -8,6 +8,7 @@ import pickle
 from skimage.feature import ORB
 from skimage.color import rgb2gray
 from skimage.io import imread
+from PIL import Image
 
 
 # # import cv2
@@ -101,6 +102,8 @@ if img_file_buffer is not None:
     # plt.axis('off')
     # st.pyplot()
     
+    img = Image.open(img_file_buffer)
+    
     Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
     
     
@@ -142,7 +145,7 @@ if img_file_buffer is not None:
 
     # Load the image
     # image_path = 'output.png'
-    image = cv2.imread(img_file_buffer)
+    image = cv2.imread(img)
     # image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
 
     # Extract SIFT descriptors for the image
