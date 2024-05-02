@@ -8,7 +8,7 @@ import pickle
 from skimage.feature import ORB
 from skimage.color import rgb2gray
 from skimage.io import imread
-import cv2
+from cv2 import cv2
 
 # # import cv2
 # # import numpy as np
