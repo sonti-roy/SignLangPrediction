@@ -1,7 +1,6 @@
 import streamlit as st
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 # import mediapipe as mp
 from skimage.transform import resize
 from sklearn.cluster import KMeans
