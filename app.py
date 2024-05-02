@@ -1,10 +1,13 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-import mediapipe as mp
+# import mediapipe as mp
 from skimage.transform import resize
-import pickle
 from sklearn.cluster import KMeans
+import pickle
+from skimage.feature import ORB
+from skimage.color import rgb2gray
+from skimage.io import imread
 import cv2
 
 # # import cv2
@@ -104,22 +107,38 @@ if img_file_buffer is not None:
     ##########################################################
     # load the model from disk
     loaded_model = pickle.load(open("svm_model.pkl", 'rb'))
-
-
-
-    # Function to extract SIFT features from a single image
+    
+    # Function to extract ORB features from a single image
     def extract_sift_features(image):
         # Convert the image to grayscale if it's not already
         if len(image.shape) == 3:
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            image = rgb2gray(image)
 
-        # Initialize SIFT detector
-        sift = cv2.SIFT_create()
+        # Initialize ORB detector
+        orb = ORB(n_keypoints=1000)  # You can adjust the number of keypoints as needed
 
-        # Detect SIFT keypoints and descriptors
-        keypoints, descriptors = sift.detectAndCompute(image, None)
+        # Detect ORB keypoints and descriptors
+        orb.detect_and_extract(image)
+        keypoints = orb.keypoints
+        descriptors = orb.descriptors
 
         return descriptors
+
+
+
+    # # Function to extract SIFT features from a single image
+    # def extract_sift_features(image):
+    #     # Convert the image to grayscale if it's not already
+    #     if len(image.shape) == 3:
+    #         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    #     # Initialize SIFT detector
+    #     sift = cv2.SIFT_create()
+
+    #     # Detect SIFT keypoints and descriptors
+    #     keypoints, descriptors = sift.detectAndCompute(image, None)
+
+    #     return descriptors
 
     # Load the image
     # image_path = 'output.png'
