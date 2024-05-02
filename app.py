@@ -1,11 +1,11 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-import cv2
 import mediapipe as mp
 from skimage.transform import resize
 import pickle
 from sklearn.cluster import KMeans
+import cv2
 
 # # import cv2
 # # import numpy as np
