@@ -102,7 +102,8 @@ if img_file_buffer is not None:
     # plt.axis('off')
     # st.pyplot()
     
-    img = Image.open(img_file_buffer)
+    bytes_data = img_file_buffer.getvalue()
+    img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     
     Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
     
