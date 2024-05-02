@@ -5,6 +5,7 @@ import cv2
 import mediapipe as mp
 from skimage.transform import resize
 import pickle
+from sklearn.cluster import KMeans
 
 # # import cv2
 # # import numpy as np
@@ -92,42 +93,77 @@ if img_file_buffer is not None:
     hand_cropped = detect_hand(image)
     if hand_cropped is not None:
         # Display the cropped hand region
-        st.subheader("Cropped Hand Region")
-        plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
-        st.pyplot()
+        # st.subheader("Cropped Hand Region")
+        # plt.imshow(cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
+        # st.pyplot()
         
         Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
         
-        # convert the hand_cropped image to array
-        hand_cropped = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2RGB)
-        target_img_resized = resize(hand_cropped, (96, 96, 3))
-        target_img_flatten = target_img_resized.flatten()
-
-        # Load saved PCA model
-        saved_pca = pickle.load(open("pca_model.pkl", 'rb'))
-
-        # Subtract mean and project onto eigenvectors
-        mean_vector = saved_pca.mean_
-        eigenvectors = saved_pca.components_
-        centered_image = target_img_flatten - mean_vector
-        pca_transformed = np.dot(centered_image, eigenvectors.T)
-
-        # Reshape the pca_transformed array
-        pca_transformed = pca_transformed.reshape(1, -1)
-
-        # Load SVM model for classification
-        model = pickle.load(open("svm_model.pkl", 'rb'))
-
-        # Predict probabilities and show results
-        probability = model.predict_proba(pca_transformed)
-        for ind, val in enumerate(Categories):
-            st.write(f'{val} : {probability[0][ind]}')
-        st.write("The predicted character is: ", Categories[np.argmax(probability)])
-
-    else:
-        st.warning("No hand detected in the image.")
         
+        ##########################################################
+        # load the model from disk
+        loaded_model = pickle.load(open("svm_model.pkl", 'rb'))
+
+
+
+        # Function to extract SIFT features from a single image
+        def extract_sift_features(image):
+            # Convert the image to grayscale if it's not already
+            if len(image.shape) == 3:
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+            # Initialize SIFT detector
+            sift = cv2.SIFT_create()
+
+            # Detect SIFT keypoints and descriptors
+            keypoints, descriptors = sift.detectAndCompute(image, None)
+
+            return descriptors
+
+        # Load the image
+        # image_path = 'output.png'
+        image = cv2.imread(hand_cropped)
+
+        # Extract SIFT descriptors for the image
+        descriptors = extract_sift_features(image)
+
+        if descriptors is not None:
+            # Apply k-means clustering to create bins/clusters
+            num_clusters = 100  # Number of clusters (you can adjust this)
+            kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+            kmeans.fit(descriptors)
+
+            # Function to generate histogram of features using k-means clusters
+            def generate_histogram(image_descriptors):
+                # Predict cluster indices for each descriptor
+                cluster_indices = kmeans.predict(image_descriptors)
+
+                # Create histogram of features
+                hist, _ = np.histogram(cluster_indices, bins=num_clusters, range=(0, num_clusters))
+
+                # Normalize the histogram to sum to 1
+                hist = hist.astype(float)
+                hist /= hist.sum()
+
+                return hist
+
+            # Generate histogram of features using k-means clusters
+            hist = generate_histogram(descriptors)
+
+            # Print the shape of the histogram
+            print("Histogram shape:", hist.shape)
+        else:
+            print("No SIFT descriptors found in the image.")
+            
+            
+        # predict the label of the image
+        # Predict the label of the image using the trained SVM model
+        predicted_label = loaded_model.predict(hist.reshape(1, -1))
+        
+        # PRINT THE PREDICTED LABEL
+        st.write("The predicted character is: ", predicted_label)
+            
         
 
 
