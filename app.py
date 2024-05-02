@@ -103,7 +103,7 @@ if img_file_buffer is not None:
     # st.pyplot()
     
     bytes_data = img_file_buffer.getvalue()
-    img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+    image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
     
     Categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y']
     
@@ -146,7 +146,7 @@ if img_file_buffer is not None:
 
     # Load the image
     # image_path = 'output.png'
-    image = cv2.imread(img)
+    # image = cv2.imread(img)
     # image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
 
     # Extract SIFT descriptors for the image
