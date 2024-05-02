@@ -123,7 +123,8 @@ if img_file_buffer is not None:
 
         # Load the image
         # image_path = 'output.png'
-        image = cv2.imread(hand_cropped)
+        # image = cv2.imread(hand_cropped)
+        image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
 
         # Extract SIFT descriptors for the image
         descriptors = extract_sift_features(image)
