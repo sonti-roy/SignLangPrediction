@@ -113,81 +113,98 @@ if img_file_buffer is not None:
     # load the model from disk
     loaded_model = pickle.load(open("svm_model.pkl", 'rb'))
     
-    # Function to extract ORB features from a single image
-    def extract_sift_features(image):
-        # Convert the image to grayscale if it's not already
-        if len(image.shape) == 3:
-            image = rgb2gray(image)
-
-        # Initialize ORB detector
-        orb = ORB(n_keypoints=1000)  # You can adjust the number of keypoints as needed
-
-        # Detect ORB keypoints and descriptors
-        orb.detect_and_extract(image)
-        keypoints = orb.keypoints
-        descriptors = orb.descriptors
-
-        return descriptors
-
-
-
-    # # Function to extract SIFT features from a single image
+    
+    if hand_cropped is not None:
+        # Apply k-means clustering to create bins/clusters
+        image = imread(hand_cropped)
+        image = rgb2gray(image)
+        image = resize(image, (64, 64,3))
+        predicted_label = loaded_model.predict(image.flatten().reshape(1, -1))
+        
+        predicted_class = Categories[predicted_label[0]]
+        st.write("The predicted character is: ", predicted_class)
+    
+    
+    
+    
+    
+    
+    
+    # # Function to extract ORB features from a single image
     # def extract_sift_features(image):
     #     # Convert the image to grayscale if it's not already
     #     if len(image.shape) == 3:
-    #         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    #         image = rgb2gray(image)
 
-    #     # Initialize SIFT detector
-    #     sift = cv2.SIFT_create()
+    #     # Initialize ORB detector
+    #     orb = ORB(n_keypoints=1000)  # You can adjust the number of keypoints as needed
 
-    #     # Detect SIFT keypoints and descriptors
-    #     keypoints, descriptors = sift.detectAndCompute(image, None)
+    #     # Detect ORB keypoints and descriptors
+    #     orb.detect_and_extract(image)
+    #     keypoints = orb.keypoints
+    #     descriptors = orb.descriptors
 
     #     return descriptors
 
-    # Load the image
-    # image_path = 'output.png'
-    # image = cv2.imread(img)
-    # image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
 
-    # Extract SIFT descriptors for the image
-    descriptors = extract_sift_features(hand_cropped)
 
-    if descriptors is not None:
-        # Apply k-means clustering to create bins/clusters
-        num_clusters = 100  # Number of clusters (you can adjust this)
-        kmeans = KMeans(n_clusters=num_clusters, random_state=42)
-        kmeans.fit(descriptors)
+    # # # Function to extract SIFT features from a single image
+    # # def extract_sift_features(image):
+    # #     # Convert the image to grayscale if it's not already
+    # #     if len(image.shape) == 3:
+    # #         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # Function to generate histogram of features using k-means clusters
-        def generate_histogram(image_descriptors):
-            # Predict cluster indices for each descriptor
-            cluster_indices = kmeans.predict(image_descriptors)
+    # #     # Initialize SIFT detector
+    # #     sift = cv2.SIFT_create()
 
-            # Create histogram of features
-            hist, _ = np.histogram(cluster_indices, bins=num_clusters, range=(0, num_clusters))
+    # #     # Detect SIFT keypoints and descriptors
+    # #     keypoints, descriptors = sift.detectAndCompute(image, None)
 
-            # Normalize the histogram to sum to 1
-            hist = hist.astype(float)
-            hist /= hist.sum()
+    # #     return descriptors
 
-            return hist
+    # # Load the image
+    # # image_path = 'output.png'
+    # # image = cv2.imread(img)
+    # # image = cv2.cvtColor(hand_cropped, cv2.COLOR_BGR2GRAY)
 
-        # Generate histogram of features using k-means clusters
-        hist = generate_histogram(descriptors)
+    # # Extract SIFT descriptors for the image
+    # descriptors = extract_sift_features(hand_cropped)
 
-        # Print the shape of the histogram
-        print("Histogram shape:", hist.shape)
-    else:
-        print("No SIFT descriptors found in the image.")
+    # if descriptors is not None:
+    #     # Apply k-means clustering to create bins/clusters
+    #     num_clusters = 100  # Number of clusters (you can adjust this)
+    #     kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+    #     kmeans.fit(descriptors)
+
+    #     # Function to generate histogram of features using k-means clusters
+    #     def generate_histogram(image_descriptors):
+    #         # Predict cluster indices for each descriptor
+    #         cluster_indices = kmeans.predict(image_descriptors)
+
+    #         # Create histogram of features
+    #         hist, _ = np.histogram(cluster_indices, bins=num_clusters, range=(0, num_clusters))
+
+    #         # Normalize the histogram to sum to 1
+    #         hist = hist.astype(float)
+    #         hist /= hist.sum()
+
+    #         return hist
+
+    #     # Generate histogram of features using k-means clusters
+    #     hist = generate_histogram(descriptors)
+
+    #     # Print the shape of the histogram
+    #     print("Histogram shape:", hist.shape)
+    # else:
+    #     print("No SIFT descriptors found in the image.")
         
         
-    # predict the label of the image
-    # Predict the label of the image using the trained SVM model
-    predicted_label = loaded_model.predict(hist.reshape(1, -1))
+    # # predict the label of the image
+    # # Predict the label of the image using the trained SVM model
+    # predicted_label = loaded_model.predict(hist.reshape(1, -1))
     
-    # PRINT THE PREDICTED LABEL
-    st.write("The predicted character is: ", predicted_label)
+    # # PRINT THE PREDICTED LABEL
+    # st.write("The predicted character is: ", predicted_label)
             
         
 
